@@ -72,6 +72,7 @@ class App(Tk):
         self.tab.add_cascade(label='File', menu=self.tab_file)
         self.tab_file.add_command(label='add music folder', command=self.add_music_folder)
         self.tab_file.add_command(label='add one music', command=self.add_one_music)
+        self.tab_file.add_command(label='add many music', command=self.add_many_music)
 
     def start_pause(self):
         self.lbl.grid_forget
@@ -142,5 +143,16 @@ class App(Tk):
                 self.list_avalible_path.append(self.music_select)
         except:
             pass
+
+    def add_many_music(self):
+        music_many_2 = []
+        self.music_many = filedialog.askopenfilenames(initialdir='music', title='select many music', filetypes=(('music files', '*.mp3'), ('music files', '*.wav')))
+        for item in self.music_many:
+            music_many_2.append(os.path.basename(item))
+        for index, item in enumerate(music_many_2):
+            if item not in self.list_avalible_music:
+                self.song_listbox.insert(END, item)
+                self.list_avalible_music.append(item)
+                self.list_avalible_path.append(self.music_many[index])
 
 App().mainloop()
