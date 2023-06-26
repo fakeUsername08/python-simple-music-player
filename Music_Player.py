@@ -44,13 +44,13 @@ class App(Tk):
         self.volumeUp_img = PhotoImage(file='photo/volumeUp_img.png')
 
         # create btns
-        self.back_btn = Button(self.frame_btns, image=self.back_img)
+        self.back_btn = Button(self.frame_btns, image=self.back_img, command=self.back)
         self.back_btn.grid(row=0, column=1)
 
         self.play_btn = Button(self.frame_btns, image=self.play_img, command=self.start_pause)
         self.play_btn.grid(row=0, column=2)
 
-        self.forward_btn = Button(self.frame_btns, image=self.forward_img)
+        self.forward_btn = Button(self.frame_btns, image=self.forward_img, command=self.forward)
         self.forward_btn.grid(row=0, column=3)
 
         self.loops_btn = Button(self.frame_btns, image=self.noloop_img, command=self.toggle_loop)
@@ -99,6 +99,14 @@ class App(Tk):
                 pygame.mixer.music.stop()
             except:
                 pass
+
+    def forward(self):
+        next_music_index = self.song_listbox.index(ACTIVE) + 1
+        self.song_listbox.activate(next_music_index)
+
+    def back(self):
+        back_music_index = self.song_listbox.index(ACTIVE) - 1
+        self.song_listbox.activate(back_music_index)
     
     def toggle_loop(self):
         if self.flg_loop == -1:
@@ -137,7 +145,7 @@ class App(Tk):
         try:
             self.music_select = filedialog.askopenfilename(initialdir='music', title='select one music', filetypes=(('music file', '*.mp3'), ('music file', '*.wav')))
             self.music_select_2 = os.path.basename(self.music_select)
-            if self.music_select_2 not in self.list_avalible_music:
+            if (self.music_select_2 not in self.list_avalible_music) and (self.music_select_2 != ''):
                 self.song_listbox.insert(END, self.music_select_2)
                 self.list_avalible_music.append(self.music_select_2)
                 self.list_avalible_path.append(self.music_select)
