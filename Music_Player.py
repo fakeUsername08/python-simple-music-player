@@ -71,24 +71,25 @@ class App(Tk):
         self.tab_file = Menu(self.tab, tearoff=0)
         self.tab.add_cascade(label='File', menu=self.tab_file)
         self.tab_file.add_command(label='add music folder', command=self.add_music_folder)
+        self.tab_file.add_command(label='add one music', command=self.add_one_music)
 
     def start_pause(self):
         self.lbl.grid_forget
         if self.flg_play_pause:
             self.flg_play_pause = False
             self.play_btn.config(image=self.pause_img)
-            # try:
-            name_music = self.song_listbox.get(ACTIVE)
-            if name_music in self.list_avalible_music:
-                path_index = self.list_avalible_music.index(name_music)
-            self.lbl.config(text=name_music)
-            self.lbl.pack(anchor=N)
-            music_volume = self.volume_btn.get()/100
-            pygame.mixer.music.load(self.list_avalible_path[path_index])
-            pygame.mixer.music.set_volume(music_volume)
-            pygame.mixer.music.play(loops=self.flg_loop)
-            # except:
-            #     pass
+            try:
+                name_music = self.song_listbox.get(ACTIVE)
+                if name_music in self.list_avalible_music:
+                    path_index = self.list_avalible_music.index(name_music)
+                self.lbl.config(text=name_music)
+                self.lbl.pack(anchor=N)
+                music_volume = self.volume_btn.get()/100
+                pygame.mixer.music.load(self.list_avalible_path[path_index])
+                pygame.mixer.music.set_volume(music_volume)
+                pygame.mixer.music.play(loops=self.flg_loop)
+            except:
+                pass
         else:
             self.flg_play_pause = True
             self.lbl.grid_forget
@@ -121,13 +122,24 @@ class App(Tk):
             self.music_list = filedialog.askdirectory(initialdir='music', title='select one folder')
             self.music_list_2 = os.listdir(self.music_list)
             for item in self.music_list_2:
-                    if (item[-4:] == '.mp3') or (item[-4:] == '.wav'):
+                    if ((item[-4:] == '.mp3') or (item[-4:] == '.wav')) and (item not in self.list_avalible_music):
                         self.song_listbox.insert(END,item)
                         self.list_avalible_music.append(item)
                         path = self.music_list + '/' + item
                         self.list_avalible_path.append(path)
                     else:
                         pass
+        except:
+            pass
+
+    def add_one_music(self):
+        try:
+            self.music_select = filedialog.askopenfilename(initialdir='music', title='select one music', filetypes=(('music file', '*.mp3'), ('music file', '*.wav')))
+            self.music_select_2 = os.path.basename(self.music_select)
+            if self.music_select_2 not in self.list_avalible_music:
+                self.song_listbox.insert(END, self.music_select_2)
+                self.list_avalible_music.append(self.music_select_2)
+                self.list_avalible_path.append(self.music_select)
         except:
             pass
 
