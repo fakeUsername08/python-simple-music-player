@@ -117,6 +117,8 @@ class App(Tk):
             self.loops_btn.config(image=self.loop_img)
 
     def toggle_volume(self):
+        music_volume = self.volume_btn.get()/100
+        pygame.mixer.music.set_volume(music_volume)
         if self.flg_volume_show:
             self.flg_volume_show = False
             self.volume_show_btn.config(image=self.volume_img)
