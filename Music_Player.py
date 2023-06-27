@@ -109,12 +109,13 @@ class App(Tk):
         self.song_listbox.activate(back_music_index)
     
     def toggle_loop(self):
-        if self.flg_loop == -1:
-            self.flg_loop = 0
-            self.loops_btn.config(image=self.noloop_img)
-        else:
-            self.flg_loop = -1
-            self.loops_btn.config(image=self.loop_img)
+        if self.flg_play_pause:
+            if self.flg_loop == -1:
+                self.flg_loop = 0
+                self.loops_btn.config(image=self.noloop_img)
+            else:
+                self.flg_loop = -1
+                self.loops_btn.config(image=self.loop_img)
 
     def toggle_volume(self):
         music_volume = self.volume_btn.get()/100
