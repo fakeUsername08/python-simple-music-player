@@ -28,6 +28,8 @@ class App(Tk):
         self.flg_loop = 0
         self.list_avalible_music = []
         self.list_avalible_path = []
+        self.pause = False
+        self.song_check = ''
 
         self.create()
 
@@ -70,13 +72,22 @@ class App(Tk):
 
         self.tab_file = Menu(self.tab, tearoff=0)
         self.tab.add_cascade(label='File', menu=self.tab_file)
-        self.tab_file.add_command(label='add music folder', command=self.add_music_folder)
-        self.tab_file.add_command(label='add one music', command=self.add_one_music)
-        self.tab_file.add_command(label='add many music', command=self.add_many_music)
+
+        self.tab_file_add = Menu(self.tab_file, tearoff=0)
+        self.tab_file_remove = Menu(self.tab_file, tearoff=0)
+        self.tab_file.add_cascade(label='add music', menu=self.tab_file_add)
+        self.tab_file.add_cascade(label='remove music', menu=self.tab_file_remove)
+
+        self.tab_file_add.add_command(label='add music folder', command=self.add_music_folder)
+        self.tab_file_add.add_command(label='add one music', command=self.add_one_music)
+        self.tab_file_add.add_command(label='add many music', command=self.add_many_music)
+
+        self.tab_file_remove.add_command(label='remove all musics', command=self.remove_all_music)
+        self.tab_file_remove.add_command(label='remove selected music', command=self.remove_selected_music)
 
     def start_pause(self):
-        self.lbl.grid_forget
-        if self.flg_play_pause:
+        self.lbl.grid_forget()
+        if self.flg_play_pause and self.song_listbox.get(ACTIVE) != '':
             self.flg_play_pause = False
             self.play_btn.config(image=self.pause_img)
             try:
@@ -86,27 +97,36 @@ class App(Tk):
                 self.lbl.config(text=name_music)
                 self.lbl.pack(anchor=N)
                 music_volume = self.volume_btn.get()/100
-                pygame.mixer.music.load(self.list_avalible_path[path_index])
-                pygame.mixer.music.set_volume(music_volume)
-                pygame.mixer.music.play(loops=self.flg_loop)
+                if self.pause and (self.song_listbox.get(ACTIVE) == self.song_check):
+                    pygame.mixer.music.unpause()
+                else:
+                    self.song_check = self.list_avalible_music[path_index]
+                    pygame.mixer.music.load(self.list_avalible_path[path_index])
+                    pygame.mixer.music.set_volume(music_volume)
+                    pygame.mixer.music.play(loops=self.flg_loop)
             except:
                 pass
-        else:
+        elif not self.flg_play_pause and self.song_listbox != '':
             self.flg_play_pause = True
-            self.lbl.grid_forget
+            self.lbl.grid_forget()
             self.play_btn.config(image=self.play_img)
             try:
-                pygame.mixer.music.stop()
+                pygame.mixer.music.pause()
+                self.pause = True
             except:
                 pass
 
     def forward(self):
         next_music_index = self.song_listbox.index(ACTIVE) + 1
+        self.song_listbox.select_clear(0,END)
         self.song_listbox.activate(next_music_index)
+        self.song_listbox.select_set(ACTIVE)
 
     def back(self):
         back_music_index = self.song_listbox.index(ACTIVE) - 1
+        self.song_listbox.select_clear(0,END)
         self.song_listbox.activate(back_music_index)
+        self.song_listbox.select_set(ACTIVE)
     
     def toggle_loop(self):
         if self.flg_play_pause:
@@ -165,5 +185,25 @@ class App(Tk):
                 self.song_listbox.insert(END, item)
                 self.list_avalible_music.append(item)
                 self.list_avalible_path.append(self.music_many[index])
+
+    def remove_selected_music(self):
+        pygame.mixer.music.stop()
+        self.pause = False
+        index = self.song_listbox.index(ACTIVE)
+        self.list_avalible_music.pop(index)
+        self.list_avalible_path.pop(index)
+        self.song_listbox.delete(ACTIVE)
+        self.song_listbox.select_set(ACTIVE)
+        self.flg_play_pause = True
+        self.play_btn.config(image=self.play_img)
+
+    def remove_all_music(self):
+        pygame.mixer.music.stop()
+        self.pause = False
+        self.list_avalible_music.clear()
+        self.list_avalible_path.clear()
+        self.song_listbox.delete(0,END)
+        self.flg_play_pause = True
+        self.play_btn.config(image=self.play_img)
 
 App().mainloop()
